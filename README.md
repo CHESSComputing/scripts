@@ -1,0 +1,2 @@
+# scripts
+CHESSComputing scripts
