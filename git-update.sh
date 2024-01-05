@@ -7,6 +7,7 @@ cd $odir
 # processes
 for srv in Authz MetaData DataDiscovery DataManagement DataBookkeeping Frontend gotools/client
 do
+    echo
     echo "### visit $srv service..."
     cd $srv
     rm go.mod go.sum
