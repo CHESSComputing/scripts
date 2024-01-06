@@ -15,9 +15,11 @@ do
     echo "### start $srv service..."
     cd $srv
     if [ -f server.json ]; then
+        echo "$PWD/srv -config server.json"
         nohup $PWD/srv -config server.json 2>&1 1>& ../logs/$srv.log < /dev/null & \
             echo $! > ../logs/$srv.pid
     else
+        echo "$PWD/srv"
         nohup $PWD/srv 2>&1 1>& ../logs/$srv.log < /dev/null & \
             echo $! > ../logs/$srv.pid
     fi
