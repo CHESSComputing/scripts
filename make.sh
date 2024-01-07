@@ -18,5 +18,5 @@ do
     if [ $code -ne 0 ]; then
         exit $code
     fi
-    cd -
+    cd - 2>&1 1>& /dev/null
 done
