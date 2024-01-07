@@ -1,13 +1,13 @@
 #!/bin/bash
 
+if [ "$#" -ne 1  ]; then
+    echo "Usage: git-commit.sh <msg>"
+    exit 1
+fi
+msg=$1
 odir=${CHESS_DIR:-$PWD}
 echo "CHESS directory: $odir"
 cd $odir
-
-msg=$1
-if [ "$msg" == "" ]; then
-    msg="update"
-fi
 
 # processes
 for srv in golib Authz MetaData DataDiscovery DataManagement DataBookkeeping Frontend gotools/client
@@ -19,5 +19,5 @@ do
     git status
     git commit -m "$msg" -a
     git push
-    cd -
+    cd - 2>&1 1>& /dev/null
 done

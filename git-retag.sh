@@ -1,7 +1,7 @@
 #!/bin/bash
 
 if [ "$#" -ne 1  ]; then
-    echo "Usage: git-tag.sh <tag>"
+    echo "Usage: git-retag.sh <tag>"
     exit 1
 fi
 tag=$1
@@ -17,5 +17,5 @@ do
     cd $srv
     git tag -d ${tag} && git push origin :refs/tags/${tag} && git tag $tag
     git push --tags
-    cd -
+    cd - 2>&1 1>& /dev/null
 done

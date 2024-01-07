@@ -17,5 +17,5 @@ do
     cd $srv
     git tag $tag
     git push --tags
-    cd -
+    cd - 2>&1 1>& /dev/null
 done

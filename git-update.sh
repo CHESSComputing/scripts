@@ -20,5 +20,5 @@ do
         echo "replace github.com/CHESSComputing/golib => ../golib" >> go.mod
     fi
     git status
-    cd -
+    cd - 2>&1 1>& /dev/null
 done

@@ -11,5 +11,5 @@ do
     echo "### visit $srv service..."
     cd $srv
     git status
-    cd -
+    cd - 2>&1 1>& /dev/null
 done
