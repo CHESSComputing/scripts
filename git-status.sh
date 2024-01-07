@@ -10,6 +10,6 @@ do
     echo
     echo "### visit $srv service..."
     cd $srv
-    git status
+    git status --short
     cd - 2>&1 1>& /dev/null
 done
