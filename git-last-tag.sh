@@ -10,6 +10,7 @@ do
     echo
     echo "### $srv ..."
     cd $srv
-    git tag --list | tail -1
+    git describe --tags --abbrev=0
+#     git for-each-ref --sort=creatordate --format '%(refname) %(creatordate)' refs/tags | tail -1
     cd - 2>&1 1>& /dev/null
 done
