@@ -11,6 +11,7 @@ do
     echo "### visit $srv service..."
     echo "--- git pull"
     cd $srv
+    git checkout -- go.mod
     git pull
     cd - 2>&1 1>& /dev/null
 done
