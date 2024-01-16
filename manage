@@ -73,7 +73,7 @@ start_services(){
         fi
         echo "$srv started with PID=`cat $LOGDIR/$srv.pid`"
         echo "log file: $LOGDIR/$srv.log"
-        cd - 2>&1 1& /dev/null
+        cd -
     done
 }
 
@@ -86,6 +86,15 @@ stop_services()
         echo "$pid" | sed "s,\n,,g"
         echo "$pid" | sed "s,\n,,g" | /bin/sh
     fi
+    for srv in $services
+    do
+        if [ -f $LOGDIR/$srv.log ]; then
+            rm  $LOGDIR/$srv.log
+        fi
+        if [ -f $LOGDIR/$srv.pid ]; then
+            rm  $LOGDIR/$srv.pid
+        fi
+    done
 }
 
 # run status over FOXDEN/CHESS services
@@ -110,6 +119,9 @@ stop_minio()
     if [ -n "${pid}" ]; then
         echo "killing MIN.IO runnig on $pid"
         kill -9 $pid
+    fi
+    if [ -f $LOGDIR/minio.log ]; then
+        rm  $LOGDIR/minio.log
     fi
 }
 
