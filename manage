@@ -1,0 +1,177 @@
+#!/bin/bash
+
+##H Usage: manage ACTION
+##H
+##H Available actions:
+##H   help        show this help
+##H   status      show current service's status
+##H   restart     (re)start the service
+##H   start       start the service
+##H   stop        stop the service
+##H
+##H For more details please refer to operations page:
+##H   https://wiki.classe.cornell.edu/CHESS/Private/CHESSMetadataService
+
+ME=$(basename $(dirname $0))
+ROOT=$(cd $(dirname $0)/.. && pwd)
+LOGDIR=$ROOT/logs
+
+if [ -d $ROOT/etc/profile.d/init.sh ]; then
+    . $ROOT/etc/profile.d/init.sh
+fi
+
+host=`hostname -s`
+services="Authz MetaData DataDiscovery DataManagement DataBookkeeping Frontend"
+
+# show all used environment variables in this script
+show_env()
+{
+    echo "CONFIG=${CHESS_FOXDEN_CONFIG:-$HOME/.foxden.yaml}"
+    echo "ROOT=$ROOT"
+    echo "LOGDIR=$LOGDIR"
+    echo "CHESS_MINIO_DIR=$CHESS_MINIO_DIR"
+    echo "minio command: `command -v minio`"
+}
+
+# checks performs checks over used directories and env variables
+checks()
+{
+    if [ -z "$CHESS_MINIO_DIR" ]; then
+        echo "CHESS_MINIO_DIR environment is not set"
+        exit 1
+    fi
+    if [ ! -d $CHESS_MINIO_DIR ]; then
+        echo "$CHESS_MINIO_DIR area does not exist"
+        exit 1
+    fi
+    if [ ! -d $LOGDIR ]; then
+        echo "$LOGDIR area does not exist"
+        exit 1
+    fi
+    if ! command -v minio &> /dev/null
+    then
+        echo "minio could not be found, please install MIN.IO and setup PATH to find minio command"
+        exit 1
+    fi
+}
+
+# start FOXDEN/CHESS services
+start_services(){
+    # start new processes
+    for srv in $services
+    do
+        echo "### start $srv service..."
+        cd $srv
+        if [ -f server.json ]; then
+            echo "$PWD/srv -config server.json"
+            nohup $PWD/srv -config server.json 2>&1 1>& $LOGDIR/$srv.log < /dev/null & \
+                echo $! > $LOGDIR/$srv.pid
+        else
+            echo "$PWD/srv"
+            nohup $PWD/srv 2>&1 1>& $LOGDIR/$srv.log < /dev/null & \
+                echo $! > $LOGDIR/$srv.pid
+        fi
+        echo "$srv started with PID=`cat $LOGDIR/$srv.pid`"
+        echo "log file: $LOGDIR/$srv.log"
+        cd - 2>&1 1& /dev/null
+    done
+}
+
+# stop FOXDEN/CHESS services
+stop_services()
+{
+    # delete existing srv processes
+    pid=`ps auxww | grep ".*/srv$" | grep -v grep | awk '{print $2}' | awk '{print "kill -9 "$1""}'`
+    if [ -n "$pid" ]; then
+        echo "$pid" | sed "s,\n,,g"
+        echo "$pid" | sed "s,\n,,g" | /bin/sh
+    fi
+}
+
+# run status over FOXDEN/CHESS services
+status_services()
+{
+    # start new processes
+    for srv in $services
+    do
+        pid=`ps auxww | grep ".*/${srv}/srv$" | grep -v grep | awk '{print $2}'`
+        if [ -n "$pid" ]; then
+            echo "service $srv is running, PID=$pid, $LOGDIR/$srv.log"
+        else
+            echo "service $srv is not running"
+        fi
+    done
+}
+
+# stop minio server
+stop_minio()
+{
+    local pid=`ps auxwww | egrep "minio server" | grep -v grep | awk 'BEGIN{ORS=" "} {print $2}'`
+    if [ -n "${pid}" ]; then
+        echo "killing MIN.IO runnig on $pid"
+        kill -9 $pid
+    fi
+}
+
+# start minio server
+start_minio()
+{
+    local pid=`ps auxwww | egrep "minio server" | grep -v grep | awk 'BEGIN{ORS=" "} {print $2}'`
+    if [ ! -z "${pid}" ]; then
+        echo "MIN.IO server is already running PID: $pid, $LOGDIR/minio.log"
+    else
+        minio server $CHESS_MINIO_DIR --address :8330 2>&1 1>& $LOGDIR/minio.log < /dev/null &
+        echo "MIN.IO server is started, $LOGDIR/minio.log"
+    fi
+}
+
+# status of minio server
+status_minio()
+{
+    local pid=`ps auxwww | egrep "minio server" | grep -v grep | awk 'BEGIN{ORS=" "} {print $2}'`
+    if [ ! -z "${pid}" ]; then
+        echo "MIN.IO server is running PID: $pid, $LOGDIR/minio.log"
+    else
+        echo "MIN.IO server is not running"
+    fi
+}
+
+case ${1:-status} in
+ restart)
+    checks
+    stop_minio
+    start_minio
+    stop_services
+    start_services 
+    ;;
+ stop)
+    checks
+    stop_services
+    stop_minio
+    status_minio
+    status_services
+    ;;
+ status)
+    checks
+    status_minio
+    status_services
+    ;;
+ start)
+    checks
+    stop_minio
+    start_minio
+    stop_services
+    start_services
+    ;;
+  env )
+    show_env
+    checks
+    ;;
+  help )
+    cat $0 | grep "^##H"
+    ;;
+  * )
+    echo "$0: unknown action '$1', please try '$0 help' or documentation." 1>&2
+    exit 1
+    ;;
+esac
