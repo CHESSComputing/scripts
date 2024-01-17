@@ -135,6 +135,11 @@ start_minio()
         minio server $CHESS_MINIO_DIR --address :8330 2>&1 1>& $LOGDIR/minio.log < /dev/null &
         echo "MIN.IO server is started, $LOGDIR/minio.log"
     fi
+
+    echo ""
+    echo "Setup minio alias using mc client (replace host:port as desired):"
+    echo "mc alias set myminio http://192.0.2.10:9000 <username> <password>"
+    echo "Use MIN.IO console to create new access key/access secret for your users"
 }
 
 # status of minio server
@@ -151,8 +156,6 @@ status_minio()
 case ${1:-status} in
  restart)
     checks
-    stop_minio
-    start_minio
     stop_services
     start_services 
     ;;
