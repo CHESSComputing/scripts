@@ -159,6 +159,13 @@ case ${1:-status} in
     stop_services
     start_services 
     ;;
+ start-minio)
+    stop_minio
+    start_minio
+    ;;
+ stop-minio)
+    stop_minio
+    ;;
  stop)
     checks
     stop_services
