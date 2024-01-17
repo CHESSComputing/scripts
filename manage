@@ -30,6 +30,7 @@ show_env()
     echo "ROOT=$ROOT"
     echo "LOGDIR=$LOGDIR"
     echo "CHESS_MINIO_DIR=$CHESS_MINIO_DIR"
+    echo "CHESS_FOXDEN_CERTS=$CHESS_FOXDEN_CERTS"
     echo "minio command: `command -v minio`"
 }
 
@@ -128,11 +129,16 @@ stop_minio()
 # start minio server
 start_minio()
 {
+    if [ -n "$CHESS_FOXDEN_CERTS" ]; then
+        cdir=$CHESS_FOXDEN_CERTS
+    else
+        cdir=/tmp
+    fi
     local pid=`ps auxwww | egrep "minio server" | grep -v grep | awk 'BEGIN{ORS=" "} {print $2}'`
     if [ ! -z "${pid}" ]; then
         echo "MIN.IO server is already running PID: $pid, $LOGDIR/minio.log"
     else
-        minio server $CHESS_MINIO_DIR --address :8330 2>&1 1>& $LOGDIR/minio.log < /dev/null &
+        minio server $CHESS_MINIO_DIR --address :8330 --certs-dir $cdir 2>&1 1>& $LOGDIR/minio.log < /dev/null &
         echo "MIN.IO server is started, $LOGDIR/minio.log"
     fi
 
