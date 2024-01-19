@@ -4,10 +4,14 @@
 ##H
 ##H Available actions:
 ##H   help        show this help
+##H   env         show env setup
 ##H   status      show current service's status
 ##H   restart     (re)start the service
 ##H   start       start the service
 ##H   stop        stop the service
+##H
+##H   start-minio start MIN.IO server
+##H   stop-minio  stop MIN.IO server
 ##H
 ##H For more details please refer to operations page:
 ##H   https://wiki.classe.cornell.edu/CHESS/Private/CHESSMetadataService
