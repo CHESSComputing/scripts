@@ -10,7 +10,8 @@ echo "CHESS directory: $odir"
 cd $odir
 
 # processes
-for srv in Authz MetaData DataDiscovery DataManagement DataBookkeeping Frontend gotools/client
+services="Authz MetaData DataDiscovery DataManagement DataBookkeeping Frontend SpecScansService gotools/client"
+for srv in $services
 do
     echo
     echo "### tag $srv with tag=$tag ..."

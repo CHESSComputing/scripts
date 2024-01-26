@@ -6,9 +6,9 @@ cd $cdir
 
 mkdir -p logs
 
-
 # processes
-for srv in golib Authz MetaData DataDiscovery DataManagement DataBookkeeping Frontend gotools/client
+services="Authz MetaData DataDiscovery DataManagement DataBookkeeping Frontend SpecScansService gotools/client"
+for srv in $services
 do
     echo
     echo "### $srv service..."

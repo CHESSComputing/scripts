@@ -11,6 +11,8 @@ fi
 
 # start new processes
 for srv in Authz MetaData DataDiscovery DataManagement DataBookkeeping Frontend
+services="Authz MetaData DataDiscovery DataManagement DataBookkeeping Frontend SpecScansService"
+for srv in $services
 do
     echo "### start $srv service..."
     cd $srv
