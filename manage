@@ -25,7 +25,7 @@ if [ -d $ROOT/etc/profile.d/init.sh ]; then
 fi
 
 host=`hostname -s`
-services="Authz MetaData DataDiscovery DataManagement DataBookkeeping Frontend SpecScansService MLHub"
+services="Authz MetaData DataDiscovery DataManagement DataBookkeeping Frontend SpecScansService MLHub PublicationService"
 
 # show all used environment variables in this script
 show_env()
