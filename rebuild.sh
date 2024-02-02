@@ -10,7 +10,7 @@ make
 cd -
 
 # processes
-services="Authz MetaData DataDiscovery DataManagement DataBookkeeping Frontend SpecScansService MLHub PublicationService gotools/client"
+services="Authz MetaData DataDiscovery DataManagement DataBookkeeping Frontend SpecScansService MLHub PublicationService gotools/foxden"
 for srv in $services
 do
     echo "### visit $srv service..."

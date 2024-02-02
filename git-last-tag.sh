@@ -1,11 +1,11 @@
-#!/bin/bash
+!/bin/bash
 
 odir=${CHESS_DIR:-$PWD}
 echo "CHESS directory: $odir"
 cd $odir
 
 # processes
-services="Authz MetaData DataDiscovery DataManagement DataBookkeeping Frontend SpecScansService MLHub PublicationService gotools/client"
+services="Authz MetaData DataDiscovery DataManagement DataBookkeeping Frontend SpecScansService MLHub PublicationService gotools/foxden"
 for srv in $services
 do
     echo
