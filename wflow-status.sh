@@ -4,6 +4,11 @@ cdir=${CHESSWORK_DIR:-$PWD}
 echo "CHESSWORK directory: $cdir"
 cd $cdir
 
+wflow=go
+if [[ $# -eq 1 ]]; then
+    wflow=$1
+fi
+
 # processes
 services="Authz MetaData DataDiscovery DataManagement DataBookkeeping Frontend SpecScansService MLHub PublicationService"
 for srv in $services
@@ -11,7 +16,7 @@ do
     echo
     echo "### $srv service..."
     cd $srv
-    PAGER="" gh run list --workflow release.yml --limit 1
+    PAGER="" gh run list --workflow ${wflow}.yml --limit 1
     code=$?
     if [ $code -ne 0 ]; then
         exit $code
