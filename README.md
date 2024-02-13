@@ -35,8 +35,11 @@ Set of scripts to manage CHESSComputing services
 # list existing releases
 ./scripts/rel.sh
 
-# list all GitHub actions
+# list all GitHub actions for (default) go action
 ./scripts/wflow-status.sh
+
+# list all GitHub actions for release action
+./scripts/wflow-status.sh release
 
 # build all services
 ./scripts/make.sh
