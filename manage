@@ -35,6 +35,8 @@ show_env()
     echo "LOGDIR=$LOGDIR"
     echo "CHESS_MINIO_DIR=$CHESS_MINIO_DIR"
     echo "CHESS_FOXDEN_CERTS=$CHESS_FOXDEN_CERTS"
+    echo "CHESS_TFAAS_DIR=$CHESS_TFAAS_DIR"
+    echo "CHESS_GOFAKE_DIR=$CHESS_GOFAKE_DIR"
     echo "minio command: `command -v minio`"
 }
 
@@ -66,13 +68,13 @@ start_ml_services()
     if [ -f $CHESS_TFAAS_DIR/tfaas ]; then
         echo "### start TFaaS service..."
         cd $CHESS_TFAAS_DIR
-        ./tfaas -config config.json 2>&1 1>& $LOGDIR/tfaas.log
+        nohup ./tfaas -config config.json 2>&1 1>& $LOGDIR/tfaas.log < /dev/null &
         cd -
     fi
     if [ -f $CHESS_GOFAKE_DIR/fake ]; then
         echo "### start GoFake service..."
         cd $CHESS_GOFAKE_DIR
-        ./fake 2>&1 1>& $LOGDIR/gofake.log
+        nohup ./fake 2>&1 1>& $LOGDIR/gofake.log < /dev/null &
         cd -
     fi
 }
