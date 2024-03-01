@@ -60,6 +60,23 @@ checks()
     fi
 }
 
+# start ML services
+start_ml_services()
+{
+    if [ -f $CHESS_TFAAS_DIR/tfaas ]; then
+        echo "### start TFaaS service..."
+        cd $CHESS_TFAAS_DIR
+        ./tfaas -config config.json 2>&1 1>& $LOGDIR/tfaas.log
+        cd -
+    fi
+    if [ -f $CHESS_GOFAKE_DIR/fake ]; then
+        echo "### start GoFake service..."
+        cd $CHESS_GOFAKE_DIR
+        ./fake 2>&1 1>& $LOGDIR/gofake.log
+        cd -
+    fi
+}
+
 # start FOXDEN/CHESS services
 start_services(){
     # start new processes
@@ -80,6 +97,28 @@ start_services(){
         echo "log file: $LOGDIR/$srv.log"
         cd -
     done
+    start_ml_services
+}
+
+# stop ML services
+stop_ml_services()
+{
+    if [ -f $CHESS_TFAAS_DIR/tfaas ]; then
+        pid=`ps auxww | grep "tfaas -config" | grep -v grep | awk '{print $2}' | awk '{print "kill -9 "$1""}'`
+        if [ -n "$pid" ]; then
+            echo "### stop TFaaS service..."
+            echo "$pid" | sed "s,\n,,g"
+            echo "$pid" | sed "s,\n,,g" | /bin/sh
+        fi
+    fi
+    if [ -f $CHESS_GOFAKE_DIR/fake ]; then
+        pid=`ps auxww | grep "fake" | grep -v grep | awk '{print $2}' | awk '{print "kill -9 "$1""}'`
+        if [ -n "$pid" ]; then
+            echo "### stop GoFake service..."
+            echo "$pid" | sed "s,\n,,g"
+            echo "$pid" | sed "s,\n,,g" | /bin/sh
+        fi
+    fi
 }
 
 # stop FOXDEN/CHESS services
@@ -100,6 +139,24 @@ stop_services()
             rm  $LOGDIR/$srv.pid
         fi
     done
+    stop_ml_services
+}
+
+# status of ML services
+status_ml_services()
+{
+    if [ -f $CHESS_TFAAS_DIR/tfaas ]; then
+        pid=`ps auxww | grep "tfaas -config" | grep -v grep | awk '{print $2}'`
+        if [ -n "$pid" ]; then
+            echo "service TFaaS is running, PID=$pid, $LOGDIR/tfaas.log"
+        fi
+    fi
+    if [ -f $CHESS_GOFAKE_DIR/fake ]; then
+        pid=`ps auxww | grep "fake" | grep -v grep | awk '{print $2}'`
+        if [ -n "$pid" ]; then
+            echo "service GoFake is running, PID=$pid, $LOGDIR/gofake.log"
+        fi
+    fi
 }
 
 # run status over FOXDEN/CHESS services
@@ -115,6 +172,7 @@ status_services()
             echo "service $srv is not running"
         fi
     done
+    status_ml_services
 }
 
 # stop minio server
