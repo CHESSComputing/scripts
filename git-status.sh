@@ -5,12 +5,12 @@ echo "CHESS directory: $odir"
 cd $odir
 
 # processes
-services="Authz MetaData DataDiscovery DataManagement DataBookkeeping Frontend SpecScansService MLHub PublicationService gotools/foxden"
+services="Authz MetaData DataDiscovery DataManagement DataBookkeeping Frontend SpecScansService MLHub PublicationService gotools/foxden gotools/migrate gotools/transform"
 for srv in $services
 do
     echo
     echo "### visit $srv service..."
     cd $srv
-    git status --short
+    git status --short --untracked-files=no
     cd - 2>&1 1>& /dev/null
 done
