@@ -15,7 +15,7 @@ do
     go mod init github.com/CHESSComputing/$srv
     go mod tidy
     echo >> go.mod
-    if [ "$srv" == "gotools/foxden" ]; then
+    if [ "$srv" == "gotools/foxden" ] || [ "$srv" == "gotools/migrate" ] ||  [ "$srv" == "gotools/transform" ]; then
         echo "replace github.com/CHESSComputing/golib => ../../golib" >> go.mod
     else
         echo "replace github.com/CHESSComputing/golib => ../golib" >> go.mod
