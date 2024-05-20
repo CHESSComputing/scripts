@@ -16,3 +16,8 @@ do
     git pull
     cd - 2>&1 1>& /dev/null
 done
+
+# pull out FOXDEN configs
+cd FOXDEN
+git pull
+cd -
