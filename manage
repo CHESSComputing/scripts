@@ -30,25 +30,25 @@ services="Authz MetaData DataDiscovery DataManagement DataBookkeeping Frontend S
 # show all used environment variables in this script
 show_env()
 {
-    echo "CONFIG=${CHESS_FOXDEN_CONFIG:-$HOME/.foxden.yaml}"
+    echo "CONFIG=${FOXDEN_CONFIG:-$HOME/.foxden.yaml}"
     echo "ROOT=$ROOT"
     echo "LOGDIR=$LOGDIR"
-    echo "CHESS_MINIO_DIR=$CHESS_MINIO_DIR"
-    echo "CHESS_FOXDEN_CERTS=$CHESS_FOXDEN_CERTS"
-    echo "CHESS_TFAAS_DIR=$CHESS_TFAAS_DIR"
-    echo "CHESS_GOFAKE_DIR=$CHESS_GOFAKE_DIR"
+    echo "MINIO_DIR=$MINIO_DIR"
+    echo "FOXDEN_CERTS=$FOXDEN_CERTS"
+    echo "TFAAS_DIR=$TFAAS_DIR"
+    echo "GOFAKE_DIR=$GOFAKE_DIR"
     echo "minio command: `command -v minio`"
 }
 
 # checks performs checks over used directories and env variables
 checks()
 {
-    if [ -z "$CHESS_MINIO_DIR" ]; then
-        echo "CHESS_MINIO_DIR environment is not set"
+    if [ -z "$MINIO_DIR" ]; then
+        echo "MINIO_DIR environment is not set"
         exit 1
     fi
-    if [ ! -d $CHESS_MINIO_DIR ]; then
-        echo "$CHESS_MINIO_DIR area does not exist"
+    if [ ! -d $MINIO_DIR ]; then
+        echo "$MINIO_DIR area does not exist"
         exit 1
     fi
     if [ ! -d $LOGDIR ]; then
@@ -65,15 +65,15 @@ checks()
 # start ML services
 start_ml_services()
 {
-    if [ -f $CHESS_TFAAS_DIR/tfaas ]; then
+    if [ -f $TFAAS_DIR/tfaas ]; then
         echo "### start TFaaS service..."
-        cd $CHESS_TFAAS_DIR
+        cd $TFAAS_DIR
         nohup ./tfaas -config config.json 2>&1 1>& $LOGDIR/tfaas.log < /dev/null &
         cd -
     fi
-    if [ -f $CHESS_GOFAKE_DIR/fake ]; then
+    if [ -f $GOFAKE_DIR/fake ]; then
         echo "### start GoFake service..."
-        cd $CHESS_GOFAKE_DIR
+        cd $GOFAKE_DIR
         nohup ./fake 2>&1 1>& $LOGDIR/gofake.log < /dev/null &
         cd -
     fi
@@ -105,7 +105,7 @@ start_services(){
 # stop ML services
 stop_ml_services()
 {
-    if [ -f $CHESS_TFAAS_DIR/tfaas ]; then
+    if [ -f $TFAAS_DIR/tfaas ]; then
         pid=`ps auxww | grep "tfaas -config" | grep -v grep | awk '{print $2}' | awk '{print "kill -9 "$1""}'`
         if [ -n "$pid" ]; then
             echo "### stop TFaaS service..."
@@ -113,7 +113,7 @@ stop_ml_services()
             echo "$pid" | sed "s,\n,,g" | /bin/sh
         fi
     fi
-    if [ -f $CHESS_GOFAKE_DIR/fake ]; then
+    if [ -f $GOFAKE_DIR/fake ]; then
         pid=`ps auxww | grep "fake" | grep -v grep | awk '{print $2}' | awk '{print "kill -9 "$1""}'`
         if [ -n "$pid" ]; then
             echo "### stop GoFake service..."
@@ -147,13 +147,13 @@ stop_services()
 # status of ML services
 status_ml_services()
 {
-    if [ -f $CHESS_TFAAS_DIR/tfaas ]; then
+    if [ -f $TFAAS_DIR/tfaas ]; then
         pid=`ps auxww | grep "tfaas -config" | grep -v grep | awk '{print $2}'`
         if [ -n "$pid" ]; then
             echo "service TFaaS is running, PID=$pid, $LOGDIR/tfaas.log"
         fi
     fi
-    if [ -f $CHESS_GOFAKE_DIR/fake ]; then
+    if [ -f $GOFAKE_DIR/fake ]; then
         pid=`ps auxww | grep "fake" | grep -v grep | awk '{print $2}'`
         if [ -n "$pid" ]; then
             echo "service GoFake is running, PID=$pid, $LOGDIR/gofake.log"
@@ -193,8 +193,8 @@ stop_minio()
 # start minio server
 start_minio()
 {
-    if [ -n "$CHESS_FOXDEN_CERTS" ]; then
-        cdir=$CHESS_FOXDEN_CERTS
+    if [ -n "$FOXDEN_CERTS" ]; then
+        cdir=$FOXDEN_CERTS
     else
         cdir=/tmp
     fi
@@ -202,7 +202,7 @@ start_minio()
     if [ ! -z "${pid}" ]; then
         echo "MIN.IO server is already running PID: $pid, $LOGDIR/minio.log"
     else
-        minio server $CHESS_MINIO_DIR --address :8330 --certs-dir $cdir 2>&1 1>& $LOGDIR/minio.log < /dev/null &
+        minio server $MINIO_DIR --address :8330 --certs-dir $cdir 2>&1 1>& $LOGDIR/minio.log < /dev/null &
         echo "MIN.IO server is started, $LOGDIR/minio.log"
     fi
 
