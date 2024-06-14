@@ -15,6 +15,12 @@
 ##H
 ##H For more details please refer to operations page:
 ##H   https://wiki.classe.cornell.edu/CHESS/Private/CHESSMetadataService
+#
+
+if [ "`whoami`" == "chessdata_svc" ]; then
+    export PATH=/home/chessdata_svc/bin:/nfs/chess/sw/chessdata_svc/go/go/bin:$PATH
+    export MINIO_DIR=/home/chessdata_svc/s3
+fi
 
 ME=$(basename $(dirname $0))
 ROOT=$(cd $(dirname $0)/.. && pwd)
