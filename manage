@@ -25,6 +25,7 @@ fi
 ME=$(basename $(dirname $0))
 ROOT=$(cd $(dirname $0)/.. && pwd)
 LOGDIR=$ROOT/logs
+HOST=`hostname -s`
 
 if [ -d $ROOT/etc/profile.d/init.sh ]; then
     . $ROOT/etc/profile.d/init.sh
@@ -74,13 +75,13 @@ start_ml_services()
     if [ -f $TFAAS_DIR/tfaas ]; then
         echo "### start TFaaS service..."
         cd $TFAAS_DIR
-        nohup ./tfaas -config config.json 2>&1 1>& $LOGDIR/tfaas.log < /dev/null &
+        nohup ./tfaas -config config.json 2>&1 1>& $LOGDIR/tfaas.log_$HOST < /dev/null &
         cd -
     fi
     if [ -f $GOFAKE_DIR/fake ]; then
         echo "### start GoFake service..."
         cd $GOFAKE_DIR
-        nohup ./fake 2>&1 1>& $LOGDIR/gofake.log < /dev/null &
+        nohup ./fake 2>&1 1>& $LOGDIR/gofake.log_$HOST < /dev/null &
         cd -
     fi
 }
@@ -94,15 +95,15 @@ start_services(){
         cd $srv
         if [ -f server.json ]; then
             echo "$PWD/srv -config server.json"
-            nohup $PWD/srv -config server.json 2>&1 1>& $LOGDIR/$srv.log < /dev/null & \
-                echo $! > $LOGDIR/$srv.pid
+            nohup $PWD/srv -config server.json 2>&1 1>& $LOGDIR/$srv.log_$HOST < /dev/null & \
+                echo $! > $LOGDIR/$srv.pid_$HOST
         else
             echo "$PWD/srv"
-            nohup $PWD/srv 2>&1 1>& $LOGDIR/$srv.log < /dev/null & \
-                echo $! > $LOGDIR/$srv.pid
+            nohup $PWD/srv 2>&1 1>& $LOGDIR/$srv.log_$HOST < /dev/null & \
+                echo $! > $LOGDIR/$srv.pid_$HOST
         fi
-        echo "$srv started with PID=`cat $LOGDIR/$srv.pid`"
-        echo "log file: $LOGDIR/$srv.log"
+        echo "$srv started with PID=`cat $LOGDIR/$srv.pid_$HOST`"
+        echo "log file: $LOGDIR/$srv.log_$HOST"
         cd -
     done
     start_ml_services
@@ -140,11 +141,11 @@ stop_services()
     fi
     for srv in $services
     do
-        if [ -f $LOGDIR/$srv.log ]; then
-            rm  $LOGDIR/$srv.log
+        if [ -f $LOGDIR/$srv.log_$HOST ]; then
+            rm  $LOGDIR/$srv.log_$HOST
         fi
-        if [ -f $LOGDIR/$srv.pid ]; then
-            rm  $LOGDIR/$srv.pid
+        if [ -f $LOGDIR/$srv.pid_$HOST ]; then
+            rm  $LOGDIR/$srv.pid_$HOST
         fi
     done
     stop_ml_services
@@ -156,13 +157,13 @@ status_ml_services()
     if [ -f $TFAAS_DIR/tfaas ]; then
         pid=`ps auxww | grep "tfaas -config" | grep -v grep | awk '{print $2}'`
         if [ -n "$pid" ]; then
-            echo "service TFaaS is running, PID=$pid, $LOGDIR/tfaas.log"
+            echo "service TFaaS is running, PID=$pid, $LOGDIR/tfaas.log_$HOST"
         fi
     fi
     if [ -f $GOFAKE_DIR/fake ]; then
         pid=`ps auxww | grep "fake" | grep -v grep | awk '{print $2}'`
         if [ -n "$pid" ]; then
-            echo "service GoFake is running, PID=$pid, $LOGDIR/gofake.log"
+            echo "service GoFake is running, PID=$pid, $LOGDIR/gofake.log_$HOST"
         fi
     fi
 }
@@ -175,7 +176,7 @@ status_services()
     do
         pid=`ps auxww | grep ".*/${srv}/srv$" | grep -v grep | awk '{print $2}'`
         if [ -n "$pid" ]; then
-            echo "service $srv is running, PID=$pid, $LOGDIR/$srv.log"
+            echo "service $srv is running, PID=$pid, $LOGDIR/$srv.log_$HOST"
         else
             echo "service $srv is not running"
         fi
@@ -191,8 +192,8 @@ stop_minio()
         echo "killing MIN.IO runnig on $pid"
         kill -9 $pid
     fi
-    if [ -f $LOGDIR/minio.log ]; then
-        rm  $LOGDIR/minio.log
+    if [ -f $LOGDIR/minio.log_$HOST ]; then
+        rm  $LOGDIR/minio.log_$HOST
     fi
 }
 
@@ -206,10 +207,10 @@ start_minio()
     fi
     local pid=`ps auxwww | egrep "minio server" | grep -v grep | awk 'BEGIN{ORS=" "} {print $2}'`
     if [ ! -z "${pid}" ]; then
-        echo "MIN.IO server is already running PID: $pid, $LOGDIR/minio.log"
+        echo "MIN.IO server is already running PID: $pid, $LOGDIR/minio.log_$HOST"
     else
-        minio server $MINIO_DIR --address :8330 --certs-dir $cdir 2>&1 1>& $LOGDIR/minio.log < /dev/null &
-        echo "MIN.IO server is started, $LOGDIR/minio.log"
+        minio server $MINIO_DIR --address :8330 --certs-dir $cdir 2>&1 1>& $LOGDIR/minio.log_$HOST < /dev/null &
+        echo "MIN.IO server is started, $LOGDIR/minio.log_$HOST"
     fi
 
     echo ""
@@ -223,7 +224,7 @@ status_minio()
 {
     local pid=`ps auxwww | egrep "minio server" | grep -v grep | awk 'BEGIN{ORS=" "} {print $2}'`
     if [ ! -z "${pid}" ]; then
-        echo "MIN.IO server is running PID: $pid, $LOGDIR/minio.log"
+        echo "MIN.IO server is running PID: $pid, $LOGDIR/minio.log_$HOST"
     else
         echo "MIN.IO server is not running"
     fi
