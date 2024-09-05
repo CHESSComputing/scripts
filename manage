@@ -86,6 +86,59 @@ start_ml_services()
     fi
 }
 
+# get release executables
+releases() {
+    if [ -n "$FOXDEN_RELEASES" ]; then
+        echo "Switch to FOXDEN_RELESES=$FOXDEN_RELEASES"
+    fi
+    while read -r srv tag _; do
+        echo "create releases/$srv/$tag area..."
+        mkdir -p releases/$srv/$tag
+        if [ -f releases/$srv/$tag/srv ]; then
+            echo "executable releases/$srv/$tag/srv already exists, continue..."
+        else
+            echo "Compile releases/$srv/$tag/srv executable..."
+            cd $srv
+            git fetch --all --tags
+            BRANCH=${tag}-branch
+            if git rev-parse $TAG >/dev/null 2>&1; then
+                echo "tag $tag exist..."
+            else
+                echo "tag $tag does not exist..."
+                continue
+            fi
+            # Check if the branch already exists
+            bhash=`git show-ref --verify refs/heads/$BRANCH`
+            if [ -n "$bhash" ]; then
+                echo "Branch $BRANCH already exists. Checking it out..."
+                git checkout $BRANCH
+            else
+                echo "Branch $BRANCH does not exists. Create $BRANCH_NAMNE..."
+                git checkout tags/$tag -b $BRANCH
+            fi
+            make
+            cp srv ../releases/$srv/$tag
+            cd -
+        fi
+        # start release executable
+        relsrv=$PWD/releases/$srv/$tag/srv
+        echo "start $relsrv ..."
+        cd $srv
+        if [ -f server.json ]; then
+            echo "$relsrv -config server.json"
+            nohup $relsrv -config server.json 2>&1 1>& $LOGDIR/$srv.log_$HOST < /dev/null & \
+                echo $! > $LOGDIR/$srv.pid_$HOST
+        else
+            echo "$relsrv"
+            nohup $relsrv 2>&1 1>& $LOGDIR/$srv.log_$HOST < /dev/null & \
+                echo $! > $LOGDIR/$srv.pid_$HOST
+        fi
+        echo "$relsrv started with PID=`cat $LOGDIR/$srv.pid_$HOST`"
+        echo "log file: $LOGDIR/$srv.log_$HOST"
+        cd -
+    done < "$FOXDEN_RELEASES"
+}
+
 # start FOXDEN/CHESS services
 start_services(){
     # start new processes
@@ -174,7 +227,7 @@ status_services()
     # start new processes
     for srv in $services
     do
-        pid=`ps auxww | grep ".*/${srv}/srv$" | grep -v grep | awk '{print $2}'`
+        pid=`ps auxww | grep ".*/${srv}/.*srv$" | grep -v grep | awk '{print $2}'`
         if [ -n "$pid" ]; then
             echo "service $srv is running, PID=$pid, $LOGDIR/$srv.log_$HOST"
         else
@@ -249,6 +302,9 @@ case ${1:-status} in
     stop_minio
     status_minio
     status_services
+    ;;
+ releases)
+    releases
     ;;
  status)
     checks
