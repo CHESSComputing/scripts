@@ -21,6 +21,12 @@ if [ "`whoami`" == "chessdata_svc" ]; then
     export PATH=/home/chessdata_svc/bin:/nfs/chess/sw/chessdata_svc/go/go/bin:$PATH
     export MINIO_DIR=/home/chessdata_svc/s3
 fi
+if [ "`hostname -s`" == "foxden-dev" ]; then
+   export FOXDEN_CONFIG=$HOME/.foxden-dev.yaml
+fi
+if [ "`hostname -s`" == "lnx15" ]; then
+   export FOXDEN_RELEASES=/home/chessdata_svc/FOXDEN/RELEASES.md
+fi
 
 ME=$(basename $(dirname $0))
 ROOT=$(cd $(dirname $0)/.. && pwd)
