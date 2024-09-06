@@ -1,9 +1,5 @@
 #!/bin/bash
 
-if [ "$#" -ne 1  ]; then
-    echo "Usage: git-branch.sh <branch>"
-    exit 1
-fi
 branch=$1
 odir=${CHESS_DIR:-$PWD}
 echo "CHESS directory: $odir"
@@ -16,6 +12,10 @@ do
     echo
     echo "### visit $srv service..."
     cd $srv
-    git checkout $branch
+    if [ -n "$branch" ]; then
+        git checkout $branch
+    else
+        git branch --show-current
+    fi
     cd - 2>&1 1>& /dev/null
 done
