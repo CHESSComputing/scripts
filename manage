@@ -88,9 +88,6 @@ start_ml_services()
 
 # get release executables
 releases() {
-    if [ -n "$FOXDEN_RELEASES" ]; then
-        echo "Switch to FOXDEN_RELESES=$FOXDEN_RELEASES"
-    fi
     while read -r srv tag _; do
         echo "create releases/$srv/$tag area..."
         mkdir -p releases/$srv/$tag
@@ -118,6 +115,8 @@ releases() {
             fi
             make
             cp srv ../releases/$srv/$tag
+            echo "Comeback to main branch..."
+            git checkout main
             cd -
         fi
         # start release executable
@@ -141,6 +140,12 @@ releases() {
 
 # start FOXDEN/CHESS services
 start_services(){
+    if [ -n "$FOXDEN_RELEASES" ]; then
+        echo ""
+        echo "### Switch to FOXDEN_RELESES=$FOXDEN_RELEASES"
+        releases
+        exit 0
+    fi
     # start new processes
     for srv in $services
     do
