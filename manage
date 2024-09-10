@@ -230,6 +230,9 @@ status_ml_services()
             echo "service GoFake is running, PID=$pid, $LOGDIR/gofake.log_$HOST"
         fi
     fi
+    echo ""
+    echo "List of running srv processes:"
+    ps auxwww | grep srv
 }
 
 # run status over FOXDEN/CHESS services
