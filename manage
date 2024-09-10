@@ -232,7 +232,7 @@ status_ml_services()
     fi
     echo ""
     echo "List of running srv processes:"
-    ps auxwww | grep srv
+    ps auxwww | grep srv | grep -v grep
 }
 
 # run status over FOXDEN/CHESS services
