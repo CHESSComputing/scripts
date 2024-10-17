@@ -1,4 +1,4 @@
-!/bin/bash
+#!/bin/bash
 
 odir=${CHESS_DIR:-$PWD}
 echo "CHESS directory: $odir"
