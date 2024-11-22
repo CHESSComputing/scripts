@@ -28,6 +28,13 @@ if [ "`hostname -s`" == "lnx15" ]; then
    export FOXDEN_RELEASES=/home/chessdata_svc/FOXDEN/RELEASES.md
 fi
 
+# check if local foxden.yaml exists and use it
+if [ -f foxden.yaml ]; then
+   export FOXDEN_CONFIG=$PWD/foxden.yaml
+   export MINIO_DIR=/tmp
+fi
+
+
 ME=$(basename $(dirname $0))
 ROOT=$(cd $(dirname $0)/.. && pwd)
 LOGDIR=$ROOT/logs
@@ -254,6 +261,12 @@ status_services()
 # stop minio server
 stop_minio()
 {
+    if ! command -v minio &> /dev/null
+    then
+        echo "minio command not found. Exiting function."
+        return  # Exit the function if 'minio' is not found
+    fi
+    # proceed only if we have minio installed
     local pid=`ps auxwww | egrep "minio server" | grep -v grep | awk 'BEGIN{ORS=" "} {print $2}'`
     if [ -n "${pid}" ]; then
         echo "killing MIN.IO runnig on $pid"
@@ -267,6 +280,12 @@ stop_minio()
 # start minio server
 start_minio()
 {
+    if ! command -v minio &> /dev/null
+    then
+        echo "minio command not found. Exiting function."
+        return  # Exit the function if 'minio' is not found
+    fi
+    # proceed only if we have minio installed
     if [ -n "$FOXDEN_CERTS" ]; then
         cdir=$FOXDEN_CERTS
     else
