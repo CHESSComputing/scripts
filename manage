@@ -33,7 +33,7 @@ if [ -f $PWD/foxden.yaml ]; then
    export FOXDEN_CONFIG=$PWD/foxden.yaml
    export MINIO_DIR=/tmp
 fi
-if [ -f $PWD/RELEASE.md ]; then
+if [ -f $PWD/RELEASES.md ]; then
    export FOXDEN_RELEASES=$PWD/RELEASES.md
 fi
 
