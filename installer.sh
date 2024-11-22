@@ -123,7 +123,7 @@ download_configs()
     do
         if [ ! -f $f ]; then
             echo "Download: $f"
-            curl -ksLO https://github.com/CHESSComputing/FOXDEN/blob/main/configs/$f
+            curl -ksLO https://raw.githubusercontent.com/CHESSComputing/FOXDEN/refs/heads/main/configs/$f
         fi
     done
     cd -
@@ -247,6 +247,9 @@ cleanup()
     echo "### Perform cleanup procedure"
     for srv in $services
     do
+        if [ -f $srv.tar.gz ]; then
+            rm -f $srv.tar.gz
+        fi
         dsrv=$(echo "$srv" | tr '[:upper:]' '[:lower:]')
         if [ -f $dsrv.tar.gz ]; then
             rm -f $dsrv.tar.gz
