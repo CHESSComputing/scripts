@@ -118,7 +118,7 @@ download_configs()
 {
     echo
     echo "### Download FOXDEN configs..."
-    files="ID1A3.json ID3A.json ID4B.json PIP.json service_map_file.json web_form_sections.json dbs_parameters.json dbs_lexicon.json"
+    files="ID1A3.json ID3A.json ID4B.json PIP.json service_map_file.json metadata_lexicon.json web_form_sections.json dbs_parameters.json dbs_lexicon.json"
     mkdir -p $FOXDEN_DIR/configs
     cd $FOXDEN_DIR/configs
     for f in $files
