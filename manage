@@ -105,6 +105,7 @@ start_ml_services()
 # get release executables
 releases() {
     while read -r srv tag _; do
+        echo
         echo "check releases/$srv/$tag/srv"
         mkdir -p releases/$srv/$tag
         if [ -e releases/$srv/$tag/srv ]; then
