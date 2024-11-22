@@ -134,8 +134,10 @@ download_scripts()
 {
     echo
     echo "### Download scripts..."
+    mkdir -p $FOXDEN_DIR/scripts
     curl -ksLO https://raw.githubusercontent.com/CHESSComputing/scripts/refs/heads/main/manage
     chmod +x manage
+    mv manage $FOXDEN_DIR/scripts
 }
 
 # helper function to create FOXDEN config
@@ -355,9 +357,9 @@ foxden_usage()
     echo
     echo "### FOXDEN services are ready..."
     echo "    Configuration file: $FOXDEN_DIR/foxden.yaml"
-    echo "    To start services : $FOXDEN_DIR/manage start"
-    echo "    To stop  services : $FOXDEN_DIR/manage stop"
-    echo "    To check status   : $FOXDEN_DIR/manage status"
+    echo "    To start services : $FOXDEN_DIR/scripts/manage start"
+    echo "    To stop  services : $FOXDEN_DIR/scripts/manage stop"
+    echo "    To check status   : $FOXDEN_DIR/scripts/manage status"
 }
 
 
