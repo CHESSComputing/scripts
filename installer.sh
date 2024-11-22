@@ -16,12 +16,14 @@ FOXDEN_DIR=$ROOT
 HOST=`hostname -s`
 mkdir -p $LOG_DIR
 mkdir -p $FOXDEN_DIR/configs
+mkdir -p $FOXDEN_DIR/databases
 
-echo "FOXDEN root   : $FOXDEN_DIR"
-echo "FOXDEN configs: $FOXDEN_DIR/configs"
-echo "LOG_DIR       : $LOG_DIR"
+echo "FOXDEN root     : $FOXDEN_DIR"
+echo "FOXDEN configs  : $FOXDEN_DIR/configs"
+echo "FOXDEN databases: $FOXDEN_DIR/databases"
+echo "LOG_DIR         : $LOG_DIR"
 
-services="Authz MetaData DataDiscovery DataManagement DataBookkeeping Frontend SpecScansService MLHub PublicationService"
+services="Authz MetaData DataDiscovery DataBookkeeping Frontend"
 
 # checks performs checks over used directories and env variables
 checks()
@@ -190,7 +192,7 @@ CHESSMetaData:
     LogLongFile: true
 Authz:
   CheckLDAP: true
-  DBUri: ./auth.db
+  DBUri: $FOXDEN_DIR/databases/auth.db
   ClientId: client_id
   ClientSecret: client_secret
   WebServer:
@@ -278,13 +280,25 @@ get_linux_flavor() {
 
 setup_databases()
 {
+    curl -ksL -o $FOXDEN_DIR/databases/auth-sqlite-schema.sql \
+        https://raw.githubusercontent.com/CHESSComputing/Authz/refs/heads/main/static/schema/sqlite-schema.sql
+    curl -ksL -o $FOXDEN_DIR/databases/dbs-sqlite-schema.sql \
+        https://raw.githubusercontent.com/CHESSComputing/DataBookkeeping/refs/heads/main/static/schema/sqlite.sql
+    # download schemas
+    cat > $FOXDEN_DIR/databases/dbs_dbfile << EOF
+sqlite3 $FOXDEN_DIR/databases/dbs.db sqlite
+EOF
+}
+
+download_databases()
+{
     # Detect platform and architecture
     OS="$(uname -s)"
     ARCH="$(uname -m)"
 
     echo
     echo "### setup databases..."
-    if ! command -v sqlite &> /dev/null
+    if ! command -v sqlite3 &> /dev/null
     then
         echo
         echo "    download SQliteDB..."
@@ -368,6 +382,6 @@ download_services
 download_configs
 download_scripts
 make_config
-# setup_databases
+setup_databases
 cleanup
 foxden_usage
