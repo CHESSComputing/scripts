@@ -310,6 +310,10 @@ start_minio()
 # status of minio server
 status_minio()
 {
+    if ! command -v minio &> /dev/null
+    then
+        return
+    fi
     local pid=`ps auxwww | egrep "minio server" | grep -v grep | awk 'BEGIN{ORS=" "} {print $2}'`
     if [ ! -z "${pid}" ]; then
         echo "MIN.IO server is running PID: $pid, $LOGDIR/minio.log_$HOST"
