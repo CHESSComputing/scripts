@@ -139,6 +139,8 @@ download_scripts()
     mkdir -p $FOXDEN_DIR/scripts
     curl -ksLO https://raw.githubusercontent.com/CHESSComputing/scripts/refs/heads/main/manage
     chmod +x manage
+    # adjust manage script to run only subset of services
+    sed -i 's/^services=.*$/services="$services"/' manage
     mv manage $FOXDEN_DIR/scripts
 }
 
@@ -201,7 +203,7 @@ Authz:
     LogLongFile: true
 DataBookkeeping:
   ApiParametersFile: $FOXDEN_DIR/configs/dbs_parameters.json
-  DBFile: $FOXDEN_DIR/configs/dbs_dbfile
+  DBFile: $FOXDEN_DIR/databases/dbs_dbfile
   LexiconFile: $FOXDEN_DIR/configs/dbs_lexicon.json
   WebServer:
     Port: 8310
@@ -278,6 +280,7 @@ get_linux_flavor() {
     fi
 }
 
+# helper function to setup databases
 setup_databases()
 {
     curl -ksL -o $FOXDEN_DIR/databases/auth-sqlite-schema.sql \
@@ -288,6 +291,9 @@ setup_databases()
     cat > $FOXDEN_DIR/databases/dbs_dbfile << EOF
 sqlite3 $FOXDEN_DIR/databases/dbs.db sqlite
 EOF
+    # initialize databases
+    sqlite3 $FOXDEN_DIR/databases/auth.db < $FOXDEN_DIR/databases/auth-sqlite-schema.sql
+    sqlite3 $FOXDEN_DIR/databases/dbs.db < $FOXDEN_DIR/databases/dbs-sqlite-schema.sql
 }
 
 download_databases()
