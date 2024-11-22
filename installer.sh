@@ -140,7 +140,7 @@ download_scripts()
     curl -ksLO https://raw.githubusercontent.com/CHESSComputing/scripts/refs/heads/main/manage
     chmod +x manage
     # adjust manage script to run only subset of services
-    sed -i 's/^services=.*$/services="$services"/' manage
+    sed -i "s/^services=.*$/services=\"$services\"/" manage
     mv manage $FOXDEN_DIR/scripts
 }
 
