@@ -29,9 +29,12 @@ if [ "`hostname -s`" == "lnx15" ]; then
 fi
 
 # check if local foxden.yaml exists and use it
-if [ -f foxden.yaml ]; then
+if [ -f $PWD/foxden.yaml ]; then
    export FOXDEN_CONFIG=$PWD/foxden.yaml
    export MINIO_DIR=/tmp
+fi
+if [ -f $PWD/RELEASE.md ]; then
+   export FOXDEN_RELEASES=$PWD/RELEASES.md
 fi
 
 
@@ -102,9 +105,9 @@ start_ml_services()
 # get release executables
 releases() {
     while read -r srv tag _; do
-        echo "create releases/$srv/$tag area..."
+        echo "check releases/$srv/$tag/srv"
         mkdir -p releases/$srv/$tag
-        if [ -f releases/$srv/$tag/srv ]; then
+        if [ -e releases/$srv/$tag/srv ]; then
             echo "executable releases/$srv/$tag/srv already exists, continue..."
         else
             echo "Compile releases/$srv/$tag/srv executable..."
@@ -135,10 +138,9 @@ releases() {
         # start release executable
         relsrv=$PWD/releases/$srv/$tag/srv
         echo "start $relsrv ..."
-        cd $srv
-        if [ -f server.json ]; then
-            echo "$relsrv -config server.json"
-            nohup $relsrv -config server.json 2>&1 1>& $LOGDIR/$srv.log_$HOST < /dev/null & \
+        if [ -f $srv/server.json ]; then
+            echo "$relsrv -config $srv/server.json"
+            nohup $relsrv -config $srv/server.json 2>&1 1>& $LOGDIR/$srv.log_$HOST < /dev/null & \
                 echo $! > $LOGDIR/$srv.pid_$HOST
         else
             echo "$relsrv"
@@ -147,7 +149,6 @@ releases() {
         fi
         echo "$relsrv started with PID=`cat $LOGDIR/$srv.pid_$HOST`"
         echo "log file: $LOGDIR/$srv.log_$HOST"
-        cd -
     done < "$FOXDEN_RELEASES"
 }
 
