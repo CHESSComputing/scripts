@@ -5,7 +5,7 @@ echo "CHESS directory: $odir"
 cd $odir
 
 # processes
-services="Authz MetaData DataDiscovery DataManagement DataBookkeeping Frontend SpecScansService MLHub PublicationService gotools/foxden gotools/migrate gotools/transform"
+services="Authz MetaData DataDiscovery DataManagement DataBookkeeping Frontend SpecScansService MLHub PublicationService gotools/foxden gotools/migrate gotools/transform gotools/metaupdate"
 for srv in $services
 do
     echo
@@ -15,7 +15,7 @@ do
     go mod init github.com/CHESSComputing/$srv
     go mod tidy
     echo >> go.mod
-    if [ "$srv" == "gotools/foxden" ] || [ "$srv" == "gotools/migrate" ] ||  [ "$srv" == "gotools/transform" ]; then
+    if [ "$srv" == "gotools/foxden" ] || [ "$srv" == "gotools/migrate" ] ||  [ "$srv" == "gotools/transform" ] || [ "$srv" == "gotools/metaupdate" ]; then
         echo "replace github.com/CHESSComputing/golib => ../../golib" >> go.mod
     else
         echo "replace github.com/CHESSComputing/golib => ../golib" >> go.mod
