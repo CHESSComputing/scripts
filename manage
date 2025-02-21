@@ -67,12 +67,10 @@ show_env()
 checks()
 {
     if [ -z "$MINIO_DIR" ]; then
-        echo "MINIO_DIR environment is not set"
-        exit 1
+        echo "WARNING: MINIO_DIR environment is not set"
     fi
     if [ ! -d $MINIO_DIR ]; then
-        echo "$MINIO_DIR area does not exist"
-        exit 1
+        echo "WARNING: $MINIO_DIR area does not exist"
     fi
     if [ ! -d $LOGDIR ]; then
         echo "$LOGDIR area does not exist"
@@ -80,8 +78,7 @@ checks()
     fi
     if ! command -v minio &> /dev/null
     then
-        echo "minio could not be found, please install MIN.IO and setup PATH to find minio command"
-        exit 1
+        echo "WARNING: minio could not be found, please install MIN.IO and setup PATH to find minio command"
     fi
 }
 
