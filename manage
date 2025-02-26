@@ -23,6 +23,10 @@ if [ "`whoami`" == "chessdata_svc" ]; then
 fi
 if [ "`hostname -s`" == "foxden-dev" ]; then
    export FOXDEN_CONFIG=$HOME/.foxden-dev.yaml
+   locDir=$(cd $(dirname $0)/ && pwd)
+   if [ -n "`echo $locDir | grep FOXDENDEMO`" ]; then
+       export FOXDEN_CONFIG=$HOME/.foxden-demo.yaml
+   fi
 fi
 if [ "`hostname -s`" == "lnx15" ]; then
    export FOXDEN_RELEASES=/home/chessdata_svc/FOXDEN/RELEASES.md
