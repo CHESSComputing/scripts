@@ -16,32 +16,42 @@
 ##H For more details please refer to operations page:
 ##H   https://wiki.classe.cornell.edu/CHESS/Private/CHESSMetadataService
 #
+# determine location of our script and logs area
+ME=$(basename $(dirname $0))
+ROOT=$(cd $(dirname $0)/.. && pwd)
+LOGDIR=$ROOT/logs
+HOST=`hostname -s`
+services="Authz MetaData DataDiscovery DataManagement DataBookkeeping Frontend SpecScansService MLHub PublicationService"
+
+if [ -d $ROOT/etc/profile.d/init.sh ]; then
+    . $ROOT/etc/profile.d/init.sh
+fi
 
 export FOXDEN_INSTANCE="local"
-foxdenDir=$(cd $(dirname $0)/ && pwd)
+export FOXDEN_ROOT=$ROOT
 if [ "`whoami`" == "chessdata_svc" ]; then
     export PATH=/home/chessdata_svc/bin:/nfs/chess/sw/chessdata_svc/go/go/bin:$PATH
     export MINIO_DIR=/home/chessdata_svc/s3
 else
     export MINIO_DIR=/tmp
 fi
-# foxden dev should reside in /path/FOXDENDEV/
-if [ -n "`echo $foxdenDir | grep '/FOXDENDEV/'`" ] && [ "`hostname -s`" == "foxden-dev" ]; then
+# foxden dev should reside in /path/FOXDENDEV
+if [ -n "`echo $FOXDEN_ROOT | grep '/FOXDENDEV$'`" ] && [ "`hostname -s`" == "foxden-dev" ]; then
     export FOXDEN_CONFIG=$HOME/.foxden-dev.yaml
     export FOXDEN_INSTANCE="dev"
     unset FOXDEN_RELEASES
 fi
-# foxden prod should reside in /path/FOXDEN/
+# foxden prod should reside in /path/FOXDEN
 if [ "`hostname -s`" == "lnx15" ]; then
     unset FOXDEN_INSTANCE
-    if [ -n "`echo $foxdenDir | grep '/FOXDEN/'`" ]; then
+    if [ -n "`echo $FOXDEN_ROOT | grep '/FOXDEN$'`" ]; then
         export FOXDEN_CONFIG=$HOME/.foxden.yaml
         export FOXDEN_RELEASES=/home/chessdata_svc/FOXDEN/RELEASES.md
         export FOXDEN_INSTANCE="prod"
     fi
 fi
-# foxden demo should reside in /path/FOXDENDEMO/
-if [ -n "`echo $foxdenDir | grep '/FOXDENDEMO/'`" ] && [ "`hostname -s`" == "foxden-dev" ]; then
+# foxden demo should reside in /path/FOXDENDEMO
+if [ -n "`echo $FOXDEN_ROOT | grep '/FOXDENDEMO$'`" ] && [ "`hostname -s`" == "foxden-dev" ]; then
     export FOXDEN_CONFIG=$HOME/.foxden-demo.yaml
     export FOXDEN_INSTANCE="demo"
     unset FOXDEN_RELEASES
@@ -73,18 +83,6 @@ if [ -z "$FOXDEN_INSTANCE" ]; then
 fi
 
 
-ME=$(basename $(dirname $0))
-ROOT=$(cd $(dirname $0)/.. && pwd)
-LOGDIR=$ROOT/logs
-HOST=`hostname -s`
-
-if [ -d $ROOT/etc/profile.d/init.sh ]; then
-    . $ROOT/etc/profile.d/init.sh
-fi
-
-host=`hostname -s`
-services="Authz MetaData DataDiscovery DataManagement DataBookkeeping Frontend SpecScansService MLHub PublicationService"
-
 # show all used environment variables in this script
 show_env()
 {
@@ -95,6 +93,7 @@ show_env()
     echo "FOXDEN_RELEASES=$FOXDEN_RELEASES"
     echo "FOXDEN_CONFIG=${FOXDEN_CONFIG:-$HOME/.foxden.yaml}"
     echo "FOXDEN_CERTS=$FOXDEN_CERTS"
+    echo "FOXDEN_ROOT=$FOXDEN_ROOT"
     echo "TFAAS_DIR=$TFAAS_DIR"
     echo "GOFAKE_DIR=$GOFAKE_DIR"
     echo "minio command: `command -v minio`"
@@ -171,7 +170,7 @@ releases() {
             cd -
         fi
         # start release executable
-        relsrv=$PWD/releases/$srv/$tag/srv
+        relsrv=$FOXDEN_ROOT/releases/$srv/$tag/srv
         echo "start $relsrv ..."
         if [ -f $srv/server.json ]; then
             echo "$relsrv -config $srv/server.json"
@@ -199,19 +198,23 @@ start_services(){
     for srv in $services
     do
         echo "### start $srv service..."
-        cd $srv
-        if [ -f server.json ]; then
-            echo "$PWD/srv -config server.json"
-            nohup $PWD/srv -config server.json 2>&1 1>& $LOGDIR/$srv.log_$HOST < /dev/null & \
+        if [ ! -f $FOXDEN_ROOT/$srv/srv ]; then
+            echo "ERROR: no $FOXDEN_ROOT/$srv/srv executable found..."
+            continue
+        fi
+        cd $FOXDEN_ROOT/$srv
+        if [ -f $FOXDEN_ROOT/$srv/server.json ]; then
+            echo "$FOXDEN_ROOT/$srv/srv -config $FOXDEN_ROOT/$srv/server.json"
+            nohup $FOXDEN_ROOT/$srv/srv -config $FOXDEN_ROOT/$srv/server.json 2>&1 1>& $LOGDIR/$srv.log_$HOST < /dev/null & \
                 echo $! > $LOGDIR/$srv.pid_$HOST
         else
-            echo "$PWD/srv"
+            echo "$FOXDEN_ROOT/$srv/srv"
             nohup $PWD/srv 2>&1 1>& $LOGDIR/$srv.log_$HOST < /dev/null & \
                 echo $! > $LOGDIR/$srv.pid_$HOST
         fi
+        cd -
         echo "$srv started with PID=`cat $LOGDIR/$srv.pid_$HOST`"
         echo "log file: $LOGDIR/$srv.log_$HOST"
-        cd -
     done
     start_ml_services
 }
