@@ -17,25 +17,23 @@
 ##H   https://wiki.classe.cornell.edu/CHESS/Private/CHESSMetadataService
 #
 
+export FOXDEN_INSTANCE="local"
 foxdenDir=$(cd $(dirname $0)/ && pwd)
 if [ "`whoami`" == "chessdata_svc" ]; then
     export PATH=/home/chessdata_svc/bin:/nfs/chess/sw/chessdata_svc/go/go/bin:$PATH
     export MINIO_DIR=/home/chessdata_svc/s3
 fi
-# foxden demo should reside in /path/FOXDENDEV/
+# foxden dev should reside in /path/FOXDENDEV/
 if [ -n "`echo $foxdenDir | grep '/FOXDENDEV/'`" ] && [ "`hostname -s`" == "foxden-dev" ]; then
    export FOXDEN_CONFIG=$HOME/.foxden-dev.yaml
    export FOXDEN_INSTANCE="dev"
    unset FOXDEN_RELEASES
 fi
-# foxden demo should reside in /path/FOXDEN/
+# foxden prod should reside in /path/FOXDEN/
 if [ -n "`echo $foxdenDir | grep '/FOXDEN/'`" ] && [ "`hostname -s`" == "lnx15" ]; then
-   # check if it is production instance
-   if [ -z "$FOXDEN_CONFIG" ] || [ "$FOXDEN_CONFIG" == "$HOME/.foxden.yaml" ] ; then
-       export FOXDEN_CONFIG=$HOME/.foxden.yaml
-       export FOXDEN_RELEASES=/home/chessdata_svc/FOXDEN/RELEASES.md
-       export FOXDEN_INSTANCE="prod"
-   fi
+   export FOXDEN_CONFIG=$HOME/.foxden.yaml
+   export FOXDEN_RELEASES=/home/chessdata_svc/FOXDEN/RELEASES.md
+   export FOXDEN_INSTANCE="prod"
 fi
 # foxden demo should reside in /path/FOXDENDEMO/
 if [ -n "`echo $foxdenDir | grep '/FOXDENDEMO/'`" ]; then
@@ -47,11 +45,16 @@ fi
 # check if local foxden.yaml exists and use it
 if [ -f $PWD/foxden.yaml ]; then
    export FOXDEN_CONFIG=$PWD/foxden.yaml
-   export FOXDEN_INSTANCE="local"
    export MINIO_DIR=/tmp
 fi
 if [ -f $PWD/RELEASES.md ]; then
    export FOXDEN_RELEASES=$PWD/RELEASES.md
+fi
+
+# if FOXDEN_INSTANCE not determined exit
+if [ -z "$FOXDEN_INSTANCE" ]; then
+   echo "Unable to determine FOXDEN_INSTANCE..."
+   exit 1
 fi
 
 
