@@ -60,6 +60,10 @@ if [ -z "$FOXDEN_CONFIG" ]; then
    echo "Unable to determine FOXDEN_CONFIG..."
    exit 1
 fi
+if [ -z "$FOXDEN_INSTANCE" ]; then
+   echo "Unable to determine FOXDEN_INSTANCE..."
+   exit 1
+fi
 
 
 ME=$(basename $(dirname $0))
