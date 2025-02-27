@@ -223,7 +223,7 @@ start_services(){
 stop_ml_services()
 {
     if [ -f $TFAAS_DIR/tfaas ]; then
-        pid=`ps auxww | grep "tfaas -config" | grep -v grep | awk '{print $2}' | awk '{print "kill -9 "$1""}'`
+        pid=`ps auxww | grep $FOXDEN_ROOT | grep "tfaas -config" | grep -v grep | awk '{print $2}' | awk '{print "kill -9 "$1""}'`
         if [ -n "$pid" ]; then
             echo "### stop TFaaS service..."
             echo "$pid" | sed "s,\n,,g"
@@ -231,7 +231,7 @@ stop_ml_services()
         fi
     fi
     if [ -f $GOFAKE_DIR/fake ]; then
-        pid=`ps auxww | grep "fake" | grep -v grep | awk '{print $2}' | awk '{print "kill -9 "$1""}'`
+        pid=`ps auxww | grep $FOXDEN_ROOT | grep "fake" | grep -v grep | awk '{print $2}' | awk '{print "kill -9 "$1""}'`
         if [ -n "$pid" ]; then
             echo "### stop GoFake service..."
             echo "$pid" | sed "s,\n,,g"
@@ -244,7 +244,7 @@ stop_ml_services()
 stop_services()
 {
     # delete existing srv processes
-    pid=`ps auxww | grep ".*/srv$" | grep -v grep | awk '{print $2}' | awk '{print "kill -9 "$1""}'`
+    pid=`ps auxww | grep $FOXDEN_ROOT | grep ".*/srv$" | grep -v grep | awk '{print $2}' | awk '{print "kill -9 "$1""}'`
     if [ -n "$pid" ]; then
         echo "$pid" | sed "s,\n,,g"
         echo "$pid" | sed "s,\n,,g" | /bin/sh
