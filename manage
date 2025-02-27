@@ -29,7 +29,10 @@ if [ "`hostname -s`" == "foxden-dev" ]; then
    fi
 fi
 if [ "`hostname -s`" == "lnx15" ]; then
-   export FOXDEN_RELEASES=/home/chessdata_svc/FOXDEN/RELEASES.md
+   # check if it is production instance
+   if [ -z "$FOXDEN_CONFIG" ] || [ "$FOXDEN_CONFIG" == "$HOME/.foxden.yaml" ] ; then
+       export FOXDEN_RELEASES=/home/chessdata_svc/FOXDEN/RELEASES.md
+   fi
 fi
 
 # check if local foxden.yaml exists and use it
@@ -57,10 +60,11 @@ services="Authz MetaData DataDiscovery DataManagement DataBookkeeping Frontend S
 # show all used environment variables in this script
 show_env()
 {
-    echo "CONFIG=${FOXDEN_CONFIG:-$HOME/.foxden.yaml}"
     echo "ROOT=$ROOT"
     echo "LOGDIR=$LOGDIR"
     echo "MINIO_DIR=$MINIO_DIR"
+    echo "FOXDEN_CONFIG=${FOXDEN_CONFIG:-$HOME/.foxden.yaml}"
+    echo "FOXDEN_RELEASES=$FOXDEN_FOXDEN_RELEASES"
     echo "FOXDEN_CERTS=$FOXDEN_CERTS"
     echo "TFAAS_DIR=$TFAAS_DIR"
     echo "GOFAKE_DIR=$GOFAKE_DIR"
