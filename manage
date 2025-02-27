@@ -17,17 +17,19 @@
 ##H   https://wiki.classe.cornell.edu/CHESS/Private/CHESSMetadataService
 #
 
+foxdenDir=$(cd $(dirname $0)/ && pwd)
 if [ "`whoami`" == "chessdata_svc" ]; then
     export PATH=/home/chessdata_svc/bin:/nfs/chess/sw/chessdata_svc/go/go/bin:$PATH
     export MINIO_DIR=/home/chessdata_svc/s3
 fi
-foxdenDir=$(cd $(dirname $0)/ && pwd)
-if [ -n "`echo $foxdenDir | grep FOXDENDEV`" ] && [ "`hostname -s`" == "foxden-dev" ]; then
+# foxden demo should reside in /path/FOXDENDEV
+if [ -n "`echo $foxdenDir | egrep FOXDENDEV$`" ] && [ "`hostname -s`" == "foxden-dev" ]; then
    export FOXDEN_CONFIG=$HOME/.foxden-dev.yaml
    export FOXDEN_INSTANCE="dev"
    unset FOXDEN_RELEASES
 fi
-if [ -n "`echo $foxdenDir | grep FOXDEN`" ] && [ "`hostname -s`" == "lnx15" ]; then
+# foxden demo should reside in /path/FOXDEN
+if [ -n "`echo $foxdenDir | egrep FOXDEN$`" ] && [ "`hostname -s`" == "lnx15" ]; then
    # check if it is production instance
    if [ -z "$FOXDEN_CONFIG" ] || [ "$FOXDEN_CONFIG" == "$HOME/.foxden.yaml" ] ; then
        export FOXDEN_CONFIG=$HOME/.foxden.yaml
@@ -35,7 +37,8 @@ if [ -n "`echo $foxdenDir | grep FOXDEN`" ] && [ "`hostname -s`" == "lnx15" ]; t
        export FOXDEN_INSTANCE="prod"
    fi
 fi
-if [ -n "`echo $foxdenDir | grep FOXDENDEMO`" ]; then
+# foxden demo should reside in /path/FOXDENDEMO
+if [ -n "`echo $foxdenDir | egrep FOXDENDEMO$`" ]; then
    export FOXDEN_CONFIG=$HOME/.foxden-demo.yaml
    export FOXDEN_INSTANCE="demo"
    unset FOXDEN_RELEASES
