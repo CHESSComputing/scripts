@@ -197,22 +197,22 @@ start_services(){
     # start new processes
     for srv in $services
     do
-        echo "### start $srv service..."
+        echo "### $srv service..."
         if [ ! -f $FOXDEN_ROOT/$srv/srv ]; then
             echo "ERROR: no $FOXDEN_ROOT/$srv/srv executable found..."
             continue
         fi
         cd $FOXDEN_ROOT/$srv
         if [ -f $FOXDEN_ROOT/$srv/server.json ]; then
-            echo "$FOXDEN_ROOT/$srv/srv -config $FOXDEN_ROOT/$srv/server.json"
+            echo "Start: $FOXDEN_ROOT/$srv/srv -config $FOXDEN_ROOT/$srv/server.json"
             nohup $FOXDEN_ROOT/$srv/srv -config $FOXDEN_ROOT/$srv/server.json 2>&1 1>& $LOGDIR/$srv.log_$HOST < /dev/null & \
                 echo $! > $LOGDIR/$srv.pid_$HOST
         else
-            echo "$FOXDEN_ROOT/$srv/srv"
+            echo "Start: $FOXDEN_ROOT/$srv/srv"
             nohup $PWD/srv 2>&1 1>& $LOGDIR/$srv.log_$HOST < /dev/null & \
                 echo $! > $LOGDIR/$srv.pid_$HOST
         fi
-        cd -
+        cd - 2>&1 1>& /dev/null
         echo "$srv started with PID=`cat $LOGDIR/$srv.pid_$HOST`"
         echo "log file: $LOGDIR/$srv.log_$HOST"
     done
