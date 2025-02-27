@@ -22,38 +22,42 @@ foxdenDir=$(cd $(dirname $0)/ && pwd)
 if [ "`whoami`" == "chessdata_svc" ]; then
     export PATH=/home/chessdata_svc/bin:/nfs/chess/sw/chessdata_svc/go/go/bin:$PATH
     export MINIO_DIR=/home/chessdata_svc/s3
+else
+    export MINIO_DIR=/tmp
 fi
 # foxden dev should reside in /path/FOXDENDEV/
 if [ -n "`echo $foxdenDir | grep '/FOXDENDEV/'`" ] && [ "`hostname -s`" == "foxden-dev" ]; then
-   export FOXDEN_CONFIG=$HOME/.foxden-dev.yaml
-   export FOXDEN_INSTANCE="dev"
-   unset FOXDEN_RELEASES
+    export FOXDEN_CONFIG=$HOME/.foxden-dev.yaml
+    export FOXDEN_INSTANCE="dev"
+    unset FOXDEN_RELEASES
 fi
 # foxden prod should reside in /path/FOXDEN/
 if [ -n "`echo $foxdenDir | grep '/FOXDEN/'`" ] && [ "`hostname -s`" == "lnx15" ]; then
-   export FOXDEN_CONFIG=$HOME/.foxden.yaml
-   export FOXDEN_RELEASES=/home/chessdata_svc/FOXDEN/RELEASES.md
-   export FOXDEN_INSTANCE="prod"
+    export FOXDEN_CONFIG=$HOME/.foxden.yaml
+    export FOXDEN_RELEASES=/home/chessdata_svc/FOXDEN/RELEASES.md
+    export FOXDEN_INSTANCE="prod"
 fi
 # foxden demo should reside in /path/FOXDENDEMO/
 if [ -n "`echo $foxdenDir | grep '/FOXDENDEMO/'`" ]; then
-   export FOXDEN_CONFIG=$HOME/.foxden-demo.yaml
-   export FOXDEN_INSTANCE="demo"
-   unset FOXDEN_RELEASES
+    export FOXDEN_CONFIG=$HOME/.foxden-demo.yaml
+    export FOXDEN_INSTANCE="demo"
+    unset FOXDEN_RELEASES
 fi
 
 # check if local foxden.yaml exists and use it
+if [ -f $HOME/.foxden.yaml ]; then
+    export FOXDEN_CONFIG=$HOME/.foxden.yaml
+fi
 if [ -f $PWD/foxden.yaml ]; then
-   export FOXDEN_CONFIG=$PWD/foxden.yaml
-   export MINIO_DIR=/tmp
+    export FOXDEN_CONFIG=$PWD/foxden.yaml
 fi
 if [ -f $PWD/RELEASES.md ]; then
-   export FOXDEN_RELEASES=$PWD/RELEASES.md
+    export FOXDEN_RELEASES=$PWD/RELEASES.md
 fi
 
-# if FOXDEN_INSTANCE not determined exit
-if [ -z "$FOXDEN_INSTANCE" ]; then
-   echo "Unable to determine FOXDEN_INSTANCE..."
+# if FOXDEN_CONFIG not determined exit
+if [ -z "$FOXDEN_CONFIG" ]; then
+   echo "Unable to determine FOXDEN_CONFIG..."
    exit 1
 fi
 
@@ -77,7 +81,7 @@ show_env()
     echo "LOGDIR=$LOGDIR"
     echo "MINIO_DIR=$MINIO_DIR"
     echo "FOXDEN_INSTANCE=$FOXDEN_INSTANCE"
-    echo "FOXDEN_RELEASES=$FOXDEN_FOXDEN_RELEASES"
+    echo "FOXDEN_RELEASES=$FOXDEN_RELEASES"
     echo "FOXDEN_CONFIG=${FOXDEN_CONFIG:-$HOME/.foxden.yaml}"
     echo "FOXDEN_CERTS=$FOXDEN_CERTS"
     echo "TFAAS_DIR=$TFAAS_DIR"
