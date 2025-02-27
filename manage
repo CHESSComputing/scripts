@@ -32,13 +32,16 @@ if [ -n "`echo $foxdenDir | grep '/FOXDENDEV/'`" ] && [ "`hostname -s`" == "foxd
     unset FOXDEN_RELEASES
 fi
 # foxden prod should reside in /path/FOXDEN/
-if [ -n "`echo $foxdenDir | grep '/FOXDEN/'`" ] && [ "`hostname -s`" == "lnx15" ]; then
-    export FOXDEN_CONFIG=$HOME/.foxden.yaml
-    export FOXDEN_RELEASES=/home/chessdata_svc/FOXDEN/RELEASES.md
-    export FOXDEN_INSTANCE="prod"
+if [ "`hostname -s`" == "lnx15" ]; then
+    unset FOXDEN_INSTANCE
+    if [ -n "`echo $foxdenDir | grep '/FOXDEN/'`" ]; then
+        export FOXDEN_CONFIG=$HOME/.foxden.yaml
+        export FOXDEN_RELEASES=/home/chessdata_svc/FOXDEN/RELEASES.md
+        export FOXDEN_INSTANCE="prod"
+    fi
 fi
 # foxden demo should reside in /path/FOXDENDEMO/
-if [ -n "`echo $foxdenDir | grep '/FOXDENDEMO/'`" ]; then
+if [ -n "`echo $foxdenDir | grep '/FOXDENDEMO/'`" ] && [ "`hostname -s`" == "foxden-dev" ]; then
     export FOXDEN_CONFIG=$HOME/.foxden-demo.yaml
     export FOXDEN_INSTANCE="demo"
     unset FOXDEN_RELEASES
