@@ -2,8 +2,8 @@
 
 ##H Usage: installer.sh [install_dir|help]
 ##H
-##H For more details please refer to operations page:
-##H   https://wiki.classe.cornell.edu/CHESS/Private/CHESSMetadataService
+##H For more details please refer to documentation page:
+##H   https://github.com/CHESSComputing/FOXDEN/blob/main/docs/main.md
 #
 ME=$(basename $(dirname $0))
 ROOT=$(cd $(dirname $0) && pwd)
