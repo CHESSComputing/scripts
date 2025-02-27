@@ -48,14 +48,18 @@ if [ -n "`echo $foxdenDir | grep '/FOXDENDEMO/'`" ] && [ "`hostname -s`" == "fox
 fi
 
 # check if local foxden.yaml exists and use it
-if [ -f $HOME/.foxden.yaml ]; then
-    export FOXDEN_CONFIG=$HOME/.foxden.yaml
+if [ -z "$FOXDEN_CONFIG" ]; then
+    if [ -f $HOME/.foxden.yaml ]; then
+        export FOXDEN_CONFIG=$HOME/.foxden.yaml
+    fi
+    if [ -f $PWD/foxden.yaml ]; then
+        export FOXDEN_CONFIG=$PWD/foxden.yaml
+    fi
 fi
-if [ -f $PWD/foxden.yaml ]; then
-    export FOXDEN_CONFIG=$PWD/foxden.yaml
-fi
-if [ -f $PWD/RELEASES.md ]; then
-    export FOXDEN_RELEASES=$PWD/RELEASES.md
+if [ -z "$FOXDEN_RELEASES" ]; then
+    if [ -f $PWD/RELEASES.md ]; then
+        export FOXDEN_RELEASES=$PWD/RELEASES.md
+    fi
 fi
 
 # if FOXDEN_CONFIG not determined exit
