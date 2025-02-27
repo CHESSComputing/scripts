@@ -23,21 +23,25 @@ if [ "`whoami`" == "chessdata_svc" ]; then
 fi
 if [ "`hostname -s`" == "foxden-dev" ]; then
    export FOXDEN_CONFIG=$HOME/.foxden-dev.yaml
+   export FOXDEN_INSTANCE="dev"
    locDir=$(cd $(dirname $0)/ && pwd)
    if [ -n "`echo $locDir | grep FOXDENDEMO`" ]; then
        export FOXDEN_CONFIG=$HOME/.foxden-demo.yaml
+       export FOXDEN_INSTANCE="demo"
    fi
 fi
 if [ "`hostname -s`" == "lnx15" ]; then
    # check if it is production instance
    if [ -z "$FOXDEN_CONFIG" ] || [ "$FOXDEN_CONFIG" == "$HOME/.foxden.yaml" ] ; then
        export FOXDEN_RELEASES=/home/chessdata_svc/FOXDEN/RELEASES.md
+       export FOXDEN_INSTANCE="prod"
    fi
 fi
 
 # check if local foxden.yaml exists and use it
 if [ -f $PWD/foxden.yaml ]; then
    export FOXDEN_CONFIG=$PWD/foxden.yaml
+   export FOXDEN_INSTANCE="local"
    export MINIO_DIR=/tmp
 fi
 if [ -f $PWD/RELEASES.md ]; then
@@ -63,8 +67,9 @@ show_env()
     echo "ROOT=$ROOT"
     echo "LOGDIR=$LOGDIR"
     echo "MINIO_DIR=$MINIO_DIR"
-    echo "FOXDEN_CONFIG=${FOXDEN_CONFIG:-$HOME/.foxden.yaml}"
+    echo "FOXDEN_INSTANCE=$FOXDEN_INSTANCE"
     echo "FOXDEN_RELEASES=$FOXDEN_FOXDEN_RELEASES"
+    echo "FOXDEN_CONFIG=${FOXDEN_CONFIG:-$HOME/.foxden.yaml}"
     echo "FOXDEN_CERTS=$FOXDEN_CERTS"
     echo "TFAAS_DIR=$TFAAS_DIR"
     echo "GOFAKE_DIR=$GOFAKE_DIR"
