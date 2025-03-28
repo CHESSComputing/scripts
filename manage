@@ -21,7 +21,7 @@ ME=$(basename $(dirname $0))
 ROOT=$(cd $(dirname $0)/.. && pwd)
 LOGDIR=$ROOT/logs
 HOST=`hostname -s`
-services="Authz MetaData DataDiscovery DataManagement DataBookkeeping Frontend SpecScansService MLHub PublicationService DOIService"
+services="Authz MetaData DataDiscovery DataManagement DataBookkeeping Frontend SpecScansService MLHub DOIService"
 
 if [ -d $ROOT/etc/profile.d/init.sh ]; then
     . $ROOT/etc/profile.d/init.sh

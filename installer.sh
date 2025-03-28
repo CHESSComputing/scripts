@@ -159,7 +159,7 @@ Services:
   AuthzUrl: http://localhost:8380
   SpecScansUrl: http://localhost:8390
   MLHubUrl: http://localhost:8350
-  PublicationUrl: http://localhost:8355
+  DOIServiceUrl: http://localhost:8377
   CHAPBookUrl: https://chapbook.classe.cornell.edu:8181
 Kerberos:
   Realm: CLASSE.CORNELL.EDU
@@ -238,10 +238,10 @@ MetaData:
     Port: 8300
     LogFile: $LOG_DIR/MetaData.log
     LogLongFile: true
-PublicationService:
+DOIService:
   WebServer:
-    Port: 8355
-    LogFile: $LOG_DIR/PublicationService.log
+    Port: 8377
+    LogFile: $LOG_DIR/DOIService.log
     LogLongFile: true
 EOF
 }

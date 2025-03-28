@@ -10,7 +10,7 @@ echo "CHESS directory: $odir"
 cd $odir
 
 # processes
-services="Authz MetaData DataDiscovery DataManagement DataBookkeeping Frontend SpecScansService MLHub PublicationService DOIService gotools/foxden gotools/migrate gotools/transform"
+services="Authz MetaData DataDiscovery DataManagement DataBookkeeping Frontend SpecScansService MLHub DOIService gotools/foxden gotools/migrate gotools/transform"
 for srv in $services
 do
     echo
