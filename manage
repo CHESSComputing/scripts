@@ -40,6 +40,7 @@ if [ -n "`echo $FOXDEN_ROOT | grep '/FOXDENDEV$'`" ] && [ "`hostname -s`" == "fo
     export FOXDEN_CONFIG=$HOME/.foxden-dev.yaml
     export FOXDEN_INSTANCE="dev"
     unset FOXDEN_RELEASES
+    services+=" BeamPass"
 fi
 # foxden prod should reside in /path/FOXDEN
 if [ "`hostname -s`" == "lnx15" ]; then
@@ -49,6 +50,7 @@ if [ "`hostname -s`" == "lnx15" ]; then
         export FOXDEN_RELEASES=/home/chessdata_svc/FOXDEN/RELEASES.md
         export FOXDEN_INSTANCE="prod"
     fi
+    services+=" BeamPass"
 fi
 # foxden demo should reside in /path/FOXDENDEMO
 if [ -n "`echo $FOXDEN_ROOT | grep '/FOXDENDEMO$'`" ] && [ "`hostname -s`" == "foxden-dev" ]; then
