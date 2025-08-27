@@ -382,7 +382,6 @@ case ${1:-status} in
     status_services
     ;;
  stop-services)
-    checks
     stop_services
     ;;
  releases)
@@ -391,6 +390,9 @@ case ${1:-status} in
  status)
     checks
     status_minio
+    status_services
+    ;;
+ status-services)
     status_services
     ;;
  start)
