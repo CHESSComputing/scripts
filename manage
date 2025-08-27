@@ -381,6 +381,10 @@ case ${1:-status} in
     status_minio
     status_services
     ;;
+ stop-services)
+    checks
+    stop_services
+    ;;
  releases)
     releases
     ;;
@@ -394,6 +398,9 @@ case ${1:-status} in
     stop_minio
     start_minio
     stop_services
+    start_services
+    ;;
+ start-services)
     start_services
     ;;
   env )
