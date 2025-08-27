@@ -296,7 +296,6 @@ status_services()
             echo "service $srv is not running"
         fi
     done
-    status_ml_services
 }
 
 # stop minio server
@@ -391,6 +390,7 @@ case ${1:-status} in
     checks
     status_minio
     status_services
+    status_ml_services
     ;;
  status-services)
     status_services
