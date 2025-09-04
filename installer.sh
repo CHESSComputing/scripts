@@ -23,7 +23,7 @@ echo "FOXDEN configs  : $FOXDEN_DIR/configs"
 echo "FOXDEN databases: $FOXDEN_DIR/databases"
 echo "LOG_DIR         : $LOG_DIR"
 
-services="Authz MetaData DataDiscovery DataBookkeeping Frontend"
+services="Authz MetaData DataDiscovery DataBookkeeping Frontend SyncService DOIService"
 
 # checks performs checks over used directories and env variables
 checks()
@@ -160,6 +160,7 @@ Services:
   SpecScansUrl: http://localhost:8390
   MLHubUrl: http://localhost:8350
   DOIServiceUrl: http://localhost:8377
+  SyncServiceUrl: http://localhost:8388
   CHAPBookUrl: https://chapbook.classe.cornell.edu:8181
 Kerberos:
   Realm: CLASSE.CORNELL.EDU
@@ -242,6 +243,15 @@ DOIService:
   WebServer:
     Port: 8377
     LogFile: $LOG_DIR/DOIService.log
+    LogLongFile: true
+SyncService:
+  MongoDB:
+    DBUri: mongodb://localhost:8230
+    DBName: foxden
+    DBColl: sync
+  WebServer:
+    Port: 8388
+    LogFile: $LOG_DIR/SyncService.log
     LogLongFile: true
 EOF
 }

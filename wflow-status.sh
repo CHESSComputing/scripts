@@ -10,7 +10,7 @@ if [[ $# -eq 1 ]]; then
 fi
 
 # processes
-services="Authz MetaData DataDiscovery DataManagement DataBookkeeping Frontend SpecScansService MLHub"
+services="Authz MetaData DataDiscovery DataManagement DataBookkeeping Frontend SyncService SpecScansService MLHub"
 for srv in $services
 do
     echo
