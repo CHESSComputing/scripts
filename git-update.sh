@@ -5,17 +5,29 @@ echo "CHESS directory: $odir"
 cd $odir
 
 # processes
-services="Authz MetaData DataDiscovery DataManagement DataBookkeeping Frontend SyncService SpecScansService MLHub DOIService gotools/foxden gotools/migrate gotools/transform gotools/metaupdate"
+services="Authz MetaData DataDiscovery DataManagement DataBookkeeping Frontend SyncService SpecScansService MLHub DOIService"
+
+# add all gotools subdirectories dynamically
+for tool in gotools/*; do
+    [ -d "$tool" ] && services="$services $tool"
+done
+
 for srv in $services
 do
     echo
     echo "### visit $srv service..."
-    cd $srv
+    cd "$srv" || { echo "Cannot enter $srv"; continue; }
+    if [ ! -f go.mod ]; then
+      echo "No go.mod found in $srv, skipping..."
+      cd - >/dev/null 2>&1
+      continue
+    fi
     rm go.mod go.sum
     go mod init github.com/CHESSComputing/$srv
     go mod tidy
     echo >> go.mod
-    if [ "$srv" == "gotools/foxden" ] || [ "$srv" == "gotools/migrate" ] ||  [ "$srv" == "gotools/transform" ] || [ "$srv" == "gotools/metaupdate" ]; then
+    # determine correct relative path to golib
+    if [[ "$srv" == gotools/* ]]; then
         echo "replace github.com/CHESSComputing/golib => ../../golib" >> go.mod
     else
         echo "replace github.com/CHESSComputing/golib => ../golib" >> go.mod
