@@ -5,7 +5,7 @@ echo "CHESSWORK directory: $cdir"
 cd $cdir
 
 # processes
-services="Authz MetaData DataDiscovery DataManagement DataBookkeeping Frontend SyncService SpecScansService MLHub DataHub gotools/foxden"
+services="Authz MetaData UserMetaData DataDiscovery DataManagement DataBookkeeping Frontend SyncService SpecScansService MLHub DataHub gotools/foxden"
 for srv in $services
 do
     echo

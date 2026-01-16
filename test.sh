@@ -7,7 +7,7 @@ cd $cdir
 mkdir -p logs
 
 # processes
-services="Authz MetaData DataDiscovery DataManagement DataBookkeeping Frontend SyncService SpecScansService MLHub gotools/foxden"
+services="Authz MetaData UserMetaData DataDiscovery DataManagement DataBookkeeping Frontend SyncService SpecScansService MLHub gotools/foxden"
 for srv in $services
 do
     echo

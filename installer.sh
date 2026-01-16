@@ -23,7 +23,7 @@ echo "FOXDEN configs  : $FOXDEN_DIR/configs"
 echo "FOXDEN databases: $FOXDEN_DIR/databases"
 echo "LOG_DIR         : $LOG_DIR"
 
-services="Authz MetaData DataDiscovery DataBookkeeping Frontend SyncService DOIService"
+services="Authz MetaData UserMetaData DataDiscovery DataBookkeeping Frontend SyncService DOIService"
 
 # checks performs checks over used directories and env variables
 checks()
