@@ -137,8 +137,105 @@ start_ml_services()
     fi
 }
 
-# get release executables
+# releases function performs the following actions:
+# - maintain a temporary list of successfully built services
+# - abort immediately if a build fails
+# - start services after the build loop completes
 releases() {
+    tmpfile=$(mktemp)
+    echo "Compile new set of executables for FOXDEN services..."
+
+    # -------- BUILD PHASE --------
+    while read -r srv tag _; do
+        echo
+        echo "check releases/$srv/$tag/srv"
+        mkdir -p releases/$srv/$tag
+
+        if [ -e releases/$srv/$tag/srv ]; then
+            echo "executable releases/$srv/$tag/srv already exists, continue..."
+        else
+            echo "Compile releases/$srv/$tag/srv executable..."
+            cd $srv
+            git fetch --all --tags
+            BRANCH=${tag}-branch
+
+            if git rev-parse $tag >/dev/null 2>&1; then
+                echo "tag $tag exist..."
+            else
+                echo "tag $tag does not exist..."
+                rm -f $tmpfile
+                exit 1
+            fi
+
+            bhash=`git show-ref --verify refs/heads/$BRANCH`
+            if [ -n "$bhash" ]; then
+                echo "Branch $BRANCH already exists. Checking it out..."
+                git checkout $BRANCH
+            else
+                echo "Branch $BRANCH does not exists. Create $BRANCH..."
+                git checkout tags/$tag -b $BRANCH
+            fi
+
+            if ! make; then
+                echo "ERROR: build failed for $srv"
+                git checkout main
+                cd -
+                rm -f $tmpfile
+                exit 1
+            fi
+
+            cp srv ../releases/$srv/$tag || {
+                echo "ERROR: failed to copy binary for $srv"
+                git checkout main
+                cd -
+                rm -f $tmpfile
+                exit 1
+            }
+
+            echo "Comeback to main branch..."
+            git checkout main
+            cd -
+        fi
+
+        echo "$srv $tag" >> $tmpfile
+
+    done < "$FOXDEN_RELEASES"
+
+    echo
+    echo "successfully compiled list of FOXDEN services"
+    cat $tmpfile
+    echo "restart FOXDEN services with new executables..."
+    echo
+
+    # -------- START PHASE --------
+    while read -r srv tag; do
+        relsrv=$FOXDEN_ROOT/releases/$srv/$tag/srv
+        echo "start $relsrv ..."
+
+        if [ -f $srv/server.json ]; then
+            echo "$relsrv -config $srv/server.json"
+            nohup $relsrv -config $srv/server.json \
+                2>&1 1>& $LOGDIR/$srv.log_$HOST < /dev/null & \
+                echo $! > $LOGDIR/$srv.pid_$HOST
+        else
+            echo "$relsrv"
+            nohup $relsrv \
+                2>&1 1>& $LOGDIR/$srv.log_$HOST < /dev/null & \
+                echo $! > $LOGDIR/$srv.pid_$HOST
+        fi
+
+        echo "$relsrv started with PID=`cat $LOGDIR/$srv.pid_$HOST`"
+        echo "log file: $LOGDIR/$srv.log_$HOST"
+
+    done < $tmpfile
+
+    rm -f $tmpfile
+}
+
+# original version of releases function which performs sequentially steps for
+# every service: check if executable exists for specific tag, if not checkout
+# tag branch, recompile executable and restart it
+releases_orig() {
     while read -r srv tag _; do
         echo
         echo "check releases/$srv/$tag/srv"
@@ -192,7 +289,7 @@ releases() {
 start_services(){
     if [ -n "$FOXDEN_RELEASES" ]; then
         echo ""
-        echo "### Switch to FOXDEN_RELESES=$FOXDEN_RELEASES"
+        echo "### Switch to FOXDEN_RELEASES=$FOXDEN_RELEASES"
         releases
         exit 0
     fi
