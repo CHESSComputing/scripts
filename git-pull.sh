@@ -12,7 +12,9 @@ do
     echo "### visit $srv service..."
     echo "--- git pull"
     cd $srv
-    git checkout -- go.mod
+    if [ -f go.mod ]; then
+      git checkout -- go.mod
+    fi
     git pull
     cd - 2>&1 1>& /dev/null
 done
