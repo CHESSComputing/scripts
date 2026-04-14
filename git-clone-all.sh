@@ -4,7 +4,7 @@ odir=${CHESS_DIR:-$PWD}
 echo "CHESS directory: $odir"
 cd $odir
 
-services="gotools Authz DataBookkeeping DataDiscovery DataManagement FOXDEN Frontend Kubernetes MLHub DataHub MetaData SpecScansService DOIService ClasseInfoService"
+services="gotools Authz DataBookkeeping DataDiscovery DataManagement FOXDEN Frontend Kubernetes MLHub DataHub MetaData SpecScansService DOIService ELogServie ClasseInfoService"
 for srv in $services
 do
     echo
