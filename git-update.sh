@@ -5,7 +5,7 @@ echo "CHESS directory: $odir"
 cd $odir
 
 # processes
-services="Authz MetaData UserMetaData DataDiscovery DataManagement DataBookkeeping Frontend SyncService SpecScansService MLHub DataHub DOIService ELogServie ClasseInfoService"
+services="Authz MetaData UserMetaData DataDiscovery DataManagement DataBookkeeping Frontend SyncService SpecScansService MLHub DataHub DOIService ELogService ClasseInfoService"
 
 # add all gotools subdirectories dynamically
 for tool in gotools/*; do
