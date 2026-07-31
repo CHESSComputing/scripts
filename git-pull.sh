@@ -14,6 +14,7 @@ do
     cd $srv
     if [ -f go.mod ]; then
       git checkout -- go.mod
+      git checkout -- go.sum
     fi
     git pull
     cd - 2>&1 1>& /dev/null
