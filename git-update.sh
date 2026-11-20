@@ -32,6 +32,8 @@ do
     else
         echo "replace github.com/CHESSComputing/golib => ../golib" >> go.mod
     fi
+    go get -u ./...
+    go mod tidy
     git status
     cd - 2>&1 1>& /dev/null
 done
