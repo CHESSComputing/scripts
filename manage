@@ -208,32 +208,36 @@ releases() {
 
 # start FOXDEN/CHESS services
 start_services(){
-    if [ -n "$FOXDEN_RELEASES" ]; then
-        echo ""
-        echo "### Switch to FOXDEN_RELEASES=$FOXDEN_RELEASES"
-        releases
-        exit 0
-    fi
     # start new processes
     for srv in $services
     do
+        if [ -n "$FOXDEN_RELEASES" ]; then
+          tag=`grep $srv $FOXDEN_RELEASES | awk '{print $2}'`
+          cmd=$FOXDEN_ROOT/releases/$srv/$tag/srv
+        else
+          cmd=$FOXDEN_ROOT/$srv/srv
+        fi
         echo "### $srv service..."
-        if [ ! -f $FOXDEN_ROOT/$srv/srv ]; then
-            echo "ERROR: no $FOXDEN_ROOT/$srv/srv executable found..."
+        if [ ! -f $cmd ]; then
+            echo "ERROR: no $cmd executable found..."
             continue
         fi
-        cd $FOXDEN_ROOT/$srv
-        if [ -f $FOXDEN_ROOT/$srv/server.json ]; then
-            echo "Start: $FOXDEN_ROOT/$srv/srv -config $FOXDEN_ROOT/$srv/server.json"
-            nohup $FOXDEN_ROOT/$srv/srv -config $FOXDEN_ROOT/$srv/server.json 2>&1 1>& $LOGDIR/$srv.log_$HOST < /dev/null & \
+
+        # start srv server
+        if [ -f $srv/server.json ]; then
+            echo "$cmd -config $srv/server.json"
+            nohup $cmd -config $srv/server.json \
+                2>&1 1>& $LOGDIR/$srv.log_$HOST < /dev/null & \
                 echo $! > $LOGDIR/$srv.pid_$HOST
         else
-            echo "Start: $FOXDEN_ROOT/$srv/srv"
-            nohup $PWD/srv 2>&1 1>& $LOGDIR/$srv.log_$HOST < /dev/null & \
+            echo "start: $cmd"
+            nohup $cmd \
+                2>&1 1>& $LOGDIR/$srv.log_$HOST < /dev/null & \
                 echo $! > $LOGDIR/$srv.pid_$HOST
         fi
+
         cd - 2>&1 1>& /dev/null
-        echo "$srv started with PID=`cat $LOGDIR/$srv.pid_$HOST`"
+        echo "$cmd started with PID=`cat $LOGDIR/$srv.pid_$HOST`"
         echo "log file: $LOGDIR/$srv.log_$HOST"
     done
     start_ml_services
